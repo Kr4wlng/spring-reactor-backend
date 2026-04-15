@@ -8,24 +8,32 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.time.LocalDate;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Document(collection = "dishes")
-public class Dish {
+@Document(collection = "clients")
+public class Client {
+
+    // SQL ACID = Atomicidad Consistencia I = Aislamiento Durabilidad
+    // NoSQL BASE = Available, Soft state and Eventual consitency
 
     @Id
     @EqualsAndHashCode.Include
     private String id;
 
-    @Field
-    private String name;
+    @Field // (name = "nombre")
+    private String firstName;
 
     @Field
-    private double price;
+    private String lastName;
 
     @Field
-    private boolean status;
+    private LocalDate birthDate;
+
+    @Field
+    private String urlPhoto;
 
 }

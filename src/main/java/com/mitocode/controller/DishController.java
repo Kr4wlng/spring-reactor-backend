@@ -50,7 +50,7 @@ public class DishController {
     }
 
     @PutMapping("/{id}")
-    public Mono<Dish> update(@PathVariable String id, @RequestBody Dish dish){
+    public Mono<ResponseEntity<Dish>> update(@PathVariable String id, @RequestBody Dish dish){
         // dish.setId(id);
         // return service.update(id, dish);
         return Mono.just(dish)

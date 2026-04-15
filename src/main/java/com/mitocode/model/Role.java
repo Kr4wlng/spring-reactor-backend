@@ -12,8 +12,8 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-@Document(collection = "dishes")
-public class Dish {
+@Document(collection = "roles")
+public class Role {
 
     @Id
     @EqualsAndHashCode.Include
@@ -21,11 +21,5 @@ public class Dish {
 
     @Field
     private String name;
-
-    @Field
-    private double price;
-
-    @Field
-    private boolean status;
 
 }
