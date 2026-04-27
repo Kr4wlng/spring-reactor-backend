@@ -1,13 +1,17 @@
 package com.mitocode.controller;
 
+import com.mitocode.dto.DishDTO;
 import com.mitocode.model.Dish;
 import com.mitocode.service.IDishService;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.ui.Model;
+import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -23,10 +27,11 @@ import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.met
 public class DishController {
 
     private final IDishService service;
+    private final ModelMapper modelMapper;
 
     @GetMapping
-    public Mono<ResponseEntity<Flux<Dish>>> findAll(){
-        Flux<Dish> fx = service.findAll();
+    public Mono<ResponseEntity<Flux<DishDTO>>> findAll(){
+        Flux<DishDTO> fx = service.findAll().map(this::convertToDTO);
 
         return Mono.just(ResponseEntity
                 .ok()
@@ -36,37 +41,42 @@ public class DishController {
     }
 
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<Dish>> findById(@PathVariable String id){
+    public Mono<ResponseEntity<DishDTO>> findById(@PathVariable String id){
         return service.findById(id)
+                .map(this::convertToDTO)
                 .map(e -> ResponseEntity
                         .ok()
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(e)
                 )
-
                 .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public Mono<ResponseEntity<Dish>> save(@RequestBody Dish dish, final ServerHttpRequest req){
-        return service.save(dish)
+    public Mono<ResponseEntity<DishDTO>> save(@RequestBody DishDTO dto, final ServerHttpRequest req){
+        return service.save(converToDocument(dto))
+                .map(this::convertToDTO)
                 .map(e -> ResponseEntity
-                        .created(URI.create(req.getURI()+"/"+e.getId()))
+                        .created(URI.create(req.getURI() + "/" + e.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(e)
                 );
     }
 
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<Dish>> update(@PathVariable String id, @RequestBody Dish dish){
+    public Mono<ResponseEntity<DishDTO>> update(@PathVariable String id, @RequestBody DishDTO dto){
         // dish.setId(id);
         // return service.update(id, dish);
-        return Mono.just(dish)
-                .map(e -> {
+        return Mono.just(dto)
+                /* .map(e -> {
                     e.setId(id);
                     return e;
+                }) */
+                .flatMap(e -> {
+                    e.setId(id);
+                    return service.update(id,converToDocument(dto));
                 })
-                .flatMap(e -> service.update(id, e))
+                .map(this::convertToDTO)
                 .map(e -> ResponseEntity
                         .ok()
                         .contentType(MediaType.APPLICATION_JSON)
@@ -112,6 +122,14 @@ public class DishController {
         // PRACTICA IDEAL
         return service.findById(id)
                 .zipWith(monoLink, EntityModel::of);
+    }
+
+    private DishDTO convertToDTO(Dish dish){
+        return modelMapper.map(dish, DishDTO.class);
+    }
+
+    private Dish converToDocument(DishDTO dishDTO){
+        return modelMapper.map(dishDTO, Dish.class);
     }
 
 }
