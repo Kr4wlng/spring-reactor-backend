@@ -3,11 +3,19 @@ package com.mitocode.controller;
 import com.mitocode.model.Dish;
 import com.mitocode.service.IDishService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.Link;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.net.URI;
+
+import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.methodOn;
 
 @RestController
 @RequestMapping("/dishes")
@@ -40,10 +48,10 @@ public class DishController {
     }
 
     @PostMapping
-    public Mono<ResponseEntity<Dish>> save(@RequestBody Dish dish){
+    public Mono<ResponseEntity<Dish>> save(@RequestBody Dish dish, final ServerHttpRequest req){
         return service.save(dish)
                 .map(e -> ResponseEntity
-                        .ok()
+                        .created(URI.create(req.getURI()+"/"+e.getId()))
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(e)
                 );
@@ -62,7 +70,9 @@ public class DishController {
                 .map(e -> ResponseEntity
                         .ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .body(e));
+                        .body(e)
+                )
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
@@ -75,6 +85,33 @@ public class DishController {
                         return Mono.just(ResponseEntity.notFound().build());
                     }
                 });
+    }
+
+    /* private Dish dishHateoas; */
+
+    @GetMapping("/hateoas/{id}")
+    public Mono<EntityModel<Dish>> getHateoas(@PathVariable String id){
+        Mono<Link> monoLink = linkTo(methodOn(DishController.class).findById(id)).withRel("dish-link").toMono();
+
+        // PRÁCTICA NO RECOMENDADA
+        /* return service.findById(id)
+                .map(e -> EntityModel.of(e, monoLink.block())); */
+
+        // PRACTICA COMUN, PERO NO IDEAL
+        /* return service.findById(id)
+                .flatMap(e -> {
+                    this.dishHateoas = e;
+                    return monoLink;
+                })
+                .map(link -> EntityModel.of(dishHateoas, link)); */
+
+        // PRACTICA INTERMEDIA
+        /* return service.findById(id)
+                .flatMap(e -> monoLink.map(link -> EntityModel.of(e, link))); */
+
+        // PRACTICA IDEAL
+        return service.findById(id)
+                .zipWith(monoLink, EntityModel::of);
     }
 
 }
