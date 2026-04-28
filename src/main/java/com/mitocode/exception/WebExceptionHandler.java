@@ -55,6 +55,6 @@ public class WebExceptionHandler extends AbstractErrorWebExceptionHandler {
 
         return ServerResponse.status(statusCode)
                 .contentType(MediaType.APPLICATION_JSON)
-                .body(BodyInserters.fromValue(generalError));
+                .body(BodyInserters.fromValue(errorResponse));
     }
 }
