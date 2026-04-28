@@ -3,6 +3,7 @@ package com.mitocode.controller;
 import com.mitocode.dto.DishDTO;
 import com.mitocode.model.Dish;
 import com.mitocode.service.IDishService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.hateoas.EntityModel;
@@ -53,7 +54,7 @@ public class DishController {
     }
 
     @PostMapping
-    public Mono<ResponseEntity<DishDTO>> save(@RequestBody DishDTO dto, final ServerHttpRequest req){
+    public Mono<ResponseEntity<DishDTO>> save(@Valid @RequestBody DishDTO dto, final ServerHttpRequest req){
         return service.save(converToDocument(dto))
                 .map(this::convertToDTO)
                 .map(e -> ResponseEntity
@@ -64,7 +65,7 @@ public class DishController {
     }
 
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<DishDTO>> update(@PathVariable String id, @RequestBody DishDTO dto){
+    public Mono<ResponseEntity<DishDTO>> update(@PathVariable String id, @Valid @RequestBody DishDTO dto){
         // dish.setId(id);
         // return service.update(id, dish);
         return Mono.just(dto)
