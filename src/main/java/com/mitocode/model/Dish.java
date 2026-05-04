@@ -23,9 +23,9 @@ public class Dish {
     private String name;
 
     @Field
-    private double price;
+    private Double price;
 
     @Field
-    private boolean status;
+    private Boolean status;
 
 }

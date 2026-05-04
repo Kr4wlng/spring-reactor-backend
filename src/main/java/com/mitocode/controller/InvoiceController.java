@@ -1,8 +1,8 @@
 package com.mitocode.controller;
 
-import com.mitocode.dto.ClientDTO;
-import com.mitocode.model.Client;
-import com.mitocode.service.IClientService;
+import com.mitocode.dto.InvoiceDTO;
+import com.mitocode.model.Invoice;
+import com.mitocode.service.IInvoiceService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -22,17 +22,17 @@ import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.lin
 import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.methodOn;
 
 @RestController
-@RequestMapping("/clients")
+@RequestMapping("/invoices")
 @RequiredArgsConstructor
-public class ClientController {
+public class InvoiceController {
 
-    private final IClientService service;
-    @Qualifier("clientMapper")
+    private final IInvoiceService service;
+    @Qualifier("invoiceMapper")
     private final ModelMapper modelMapper;
 
     @GetMapping
-    public Mono<ResponseEntity<Flux<ClientDTO>>> findAll(){
-        Flux<ClientDTO> fx = service.findAll().map(this::convertToDTO);
+    public Mono<ResponseEntity<Flux<InvoiceDTO>>> findAll(){
+        Flux<InvoiceDTO> fx = service.findAll().map(this::convertToDTO);
 
         return Mono.just(ResponseEntity
                 .ok()
@@ -42,7 +42,7 @@ public class ClientController {
     }
 
     @GetMapping("/{id}")
-    public Mono<ResponseEntity<ClientDTO>> findById(@PathVariable String id){
+    public Mono<ResponseEntity<InvoiceDTO>> findById(@PathVariable String id){
         return service.findById(id)
                 .map(this::convertToDTO)
                 .map(e -> ResponseEntity
@@ -54,7 +54,7 @@ public class ClientController {
     }
 
     @PostMapping
-    public Mono<ResponseEntity<ClientDTO>> save(@Valid @RequestBody ClientDTO dto, final ServerHttpRequest req){
+    public Mono<ResponseEntity<InvoiceDTO>> save(@Valid @RequestBody InvoiceDTO dto, final ServerHttpRequest req){
         return service.save(converToDocument(dto))
                 .map(this::convertToDTO)
                 .map(e -> ResponseEntity
@@ -65,9 +65,9 @@ public class ClientController {
     }
 
     @PutMapping("/{id}")
-    public Mono<ResponseEntity<ClientDTO>> update(@PathVariable String id, @Valid @RequestBody ClientDTO dto){
-        // client.setId(id);
-        // return service.update(id, client);
+    public Mono<ResponseEntity<InvoiceDTO>> update(@PathVariable String id, @Valid @RequestBody InvoiceDTO dto){
+        // invoice.setId(id);
+        // return service.update(id, invoice);
         return Mono.just(dto)
                 /* .map(e -> {
                     e.setId(id);
@@ -98,11 +98,11 @@ public class ClientController {
                 });
     }
 
-    /* private Client clientHateoas; */
+    /* private Invoice invoiceHateoas; */
 
     @GetMapping("/hateoas/{id}")
-    public Mono<EntityModel<Client>> getHateoas(@PathVariable String id){
-        Mono<Link> monoLink = linkTo(methodOn(ClientController.class).findById(id)).withRel("client-link").toMono();
+    public Mono<EntityModel<Invoice>> getHateoas(@PathVariable String id){
+        Mono<Link> monoLink = linkTo(methodOn(InvoiceController.class).findById(id)).withRel("invoice-link").toMono();
 
         // PRÁCTICA NO RECOMENDADA
         /* return service.findById(id)
@@ -111,10 +111,10 @@ public class ClientController {
         // PRACTICA COMUN, PERO NO IDEAL
         /* return service.findById(id)
                 .flatMap(e -> {
-                    this.clientHateoas = e;
+                    this.invoiceHateoas = e;
                     return monoLink;
                 })
-                .map(link -> EntityModel.of(clientHateoas, link)); */
+                .map(link -> EntityModel.of(invoiceHateoas, link)); */
 
         // PRACTICA INTERMEDIA
         /* return service.findById(id)
@@ -125,12 +125,12 @@ public class ClientController {
                 .zipWith(monoLink, EntityModel::of);
     }
 
-    private ClientDTO convertToDTO(Client client){
-        return modelMapper.map(client, ClientDTO.class);
+    private InvoiceDTO convertToDTO(Invoice invoice){
+        return modelMapper.map(invoice, InvoiceDTO.class);
     }
 
-    private Client converToDocument(ClientDTO clientDTO){
-        return modelMapper.map(clientDTO, Client.class);
+    private Invoice converToDocument(InvoiceDTO invoiceDTO){
+        return modelMapper.map(invoiceDTO, Invoice.class);
     }
 
 }

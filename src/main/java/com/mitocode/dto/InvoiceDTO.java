@@ -1,22 +1,22 @@
 package com.mitocode.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.mitocode.model.InvoiceDetail;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ClientDTO {
+public class InvoiceDTO {
 
     private String id;
-    private String name;
-    private String surname;
-    private LocalDate birthDateClient;
-    private String picture;
+    private String description;
+    private ClientDTO client;
+    private List<InvoiceDetailDTO> items;
 
 }
