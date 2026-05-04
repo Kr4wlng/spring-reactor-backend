@@ -6,6 +6,7 @@ import com.mitocode.service.IClientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.MediaType;
@@ -26,6 +27,7 @@ import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.met
 public class ClientController {
 
     private final IClientService service;
+    @Qualifier("clientMapper")
     private final ModelMapper modelMapper;
 
     @GetMapping

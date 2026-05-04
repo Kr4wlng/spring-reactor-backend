@@ -21,7 +21,8 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 @Component
-@Order(Ordered.HIGHEST_PRECEDENCE)
+// @Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(-1)
 public class WebExceptionHandler extends AbstractErrorWebExceptionHandler {
 
 

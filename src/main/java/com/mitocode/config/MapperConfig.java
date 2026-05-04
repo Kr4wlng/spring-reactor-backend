@@ -25,8 +25,8 @@ public class MapperConfig {
         // LECTURA
         mapper.createTypeMap(Client.class, ClientDTO.class)
                 .addMapping(Client::getFirstName, (dest, v) -> dest.setName((String) v))
-                .addMapping(Client::getLastName, (dest, v) -> dest.setName((String) v))
-                .addMapping(Client::getUrlPhoto, (dest, v) -> dest.setName((String) v));
+                .addMapping(Client::getLastName, (dest, v) -> dest.setSurname((String) v))
+                .addMapping(Client::getUrlPhoto, (dest, v) -> dest.setPicture((String) v));
 
         // ESCRITURA
 

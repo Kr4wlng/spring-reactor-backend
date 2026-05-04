@@ -6,6 +6,7 @@ import com.mitocode.service.IDishService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.MediaType;
@@ -28,6 +29,7 @@ import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.met
 public class DishController {
 
     private final IDishService service;
+    @Qualifier("defaultMapper")
     private final ModelMapper modelMapper;
 
     @GetMapping
