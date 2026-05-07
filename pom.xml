@@ -47,6 +47,13 @@
             <version>3.2.4</version>
         </dependency>
 
+        <!-- JasperReports -->
+        <dependency>
+            <groupId>net.sf.jasperreports</groupId>
+            <artifactId>jasperreports</artifactId>
+            <version>6.20.0</version>
+        </dependency>
+
         <!-- Necesario desde Spring Boot 2.5 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

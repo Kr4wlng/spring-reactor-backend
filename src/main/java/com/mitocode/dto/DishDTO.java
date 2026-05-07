@@ -24,9 +24,9 @@ public class DishDTO {
     @NotNull
     @Min(value = 1)
     @Max(value = 999)
-    private double priceDish;
+    private Double priceDish;
 
     @NotNull
-    private boolean statusDish;
+    private Boolean statusDish;
 
 }
