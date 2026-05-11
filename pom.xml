@@ -48,6 +48,13 @@
             <version>6.20.0</version>
         </dependency>
 
+        <!-- Cloudinary Subir fotos: https://cloudinary.com/documentation/java_integration#overview -->
+        <dependency>
+            <groupId>com.cloudinary</groupId>
+            <artifactId>cloudinary-http44</artifactId>
+            <version>1.33.0</version>
+        </dependency>
+
         <!-- Necesario desde Spring Boot 2.5 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

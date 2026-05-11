@@ -1,22 +1,29 @@
 package com.mitocode.controller;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.mitocode.dto.ClientDTO;
 import com.mitocode.model.Client;
 import com.mitocode.service.IClientService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.cloudinary.json.JSONObject;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.io.File;
 import java.net.URI;
+import java.nio.file.Files;
+import java.util.Map;
 
 import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.reactive.WebFluxLinkBuilder.methodOn;
@@ -29,6 +36,7 @@ public class ClientController {
     private final IClientService service;
     @Qualifier("clientMapper")
     private final ModelMapper modelMapper;
+    private final Cloudinary cloudinary;
 
     @GetMapping
     public Mono<ResponseEntity<Flux<ClientDTO>>> findAll(){
@@ -123,6 +131,59 @@ public class ClientController {
         // PRACTICA IDEAL
         return service.findById(id)
                 .zipWith(monoLink, EntityModel::of);
+    }
+
+    @PostMapping("/v1/upload/{id}")
+    public Mono<ResponseEntity<ClientDTO>> uploadV1(@PathVariable String id, @RequestPart("file")FilePart filePart){
+        return service.findById(id)
+                .flatMap(client -> {
+                    try{
+                        File f = Files.createTempFile("temp", filePart.filename()).toFile();
+                        filePart.transferTo(f);
+                        Map<String, Object> response = cloudinary.uploader().upload(f, ObjectUtils.asMap("resource_type", "auto"));
+                        JSONObject json = new JSONObject(response);
+                        String url = json.getString("url");
+
+                        client.setUrlPhoto(url);
+
+                        return service.update(id, client)
+                                .map(this::convertToDTO)
+                                .map(e -> ResponseEntity.ok().body(e));
+                    } catch (Exception e){
+                        return Mono.just(ResponseEntity.badRequest().build());
+                    }
+
+                });
+    }
+
+    @PostMapping("/v2/upload/{id}")
+    public Mono<ResponseEntity<ClientDTO>> uploadV2(@PathVariable String id, @RequestPart("file") FilePart filePart){
+        // Crear archivo temporal
+        Mono<File> tempFileMono = Mono.fromCallable( () ->
+                Files.createTempFile("temp", filePart.filename()).toFile()
+        );
+
+        // Buscar cliente por ID
+        Mono<Client> clientMono = service.findById(id);
+
+        return tempFileMono
+                .flatMap(tmpFile -> filePart.transferTo(tmpFile).thenReturn(tmpFile))
+                .flatMap(tmpFile -> uploadToCloudinary(tmpFile)
+                        .zipWith(clientMono, (url, client) -> {
+                            client.setUrlPhoto(url);
+                            return client;
+                        })
+                )
+                .flatMap(client -> service.update(id, client))
+                .map(this::convertToDTO)
+                .map(ResponseEntity::ok);
+    }
+
+    private Mono<String> uploadToCloudinary(File tempFile){
+        return Mono.fromCallable( () -> {
+            Map<String, Object> response = cloudinary.uploader().upload(tempFile, ObjectUtils.asMap("resource_type", "auto"));
+            return new JSONObject(response).getString("url");
+        });
     }
 
     private ClientDTO convertToDTO(Client client){
