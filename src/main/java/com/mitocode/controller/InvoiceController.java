@@ -125,6 +125,17 @@ public class InvoiceController {
                 .zipWith(monoLink, EntityModel::of);
     }
 
+    @GetMapping("/generateReport/{id}")
+    public Mono<ResponseEntity<byte[]>> generateReport(@PathVariable String id){
+        return service.generateReport(id)
+                .map(bytes -> ResponseEntity
+                        .ok()
+                        .contentType(MediaType.APPLICATION_PDF)
+                        .body(bytes)
+                )
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
     private InvoiceDTO convertToDTO(Invoice invoice){
         return modelMapper.map(invoice, InvoiceDTO.class);
     }
