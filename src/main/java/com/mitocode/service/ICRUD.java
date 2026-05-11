@@ -13,6 +13,6 @@ public interface ICRUD<T, ID> {
     Flux<T> findAll();
     Mono<T> findById(ID id);
     Mono<Boolean> delete(ID id);
-    Mono<PageSupport<T>> getPage(Pageable pageable);
+    Mono<PageSupport<T>> getPage(Class<T> entityClass, Pageable pageable);
 
 }
