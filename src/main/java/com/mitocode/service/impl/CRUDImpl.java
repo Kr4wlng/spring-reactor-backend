@@ -1,7 +1,9 @@
 package com.mitocode.service.impl;
 
+import com.mitocode.pagination.PageSupport;
 import com.mitocode.repo.IGenericRepo;
 import com.mitocode.service.ICRUD;
+import org.springframework.data.domain.Pageable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -40,5 +42,10 @@ public abstract class CRUDImpl<T, ID> implements ICRUD<T, ID> {
                         return Mono.just(false);
                     }
                 });
+    }
+
+    @Override
+    public Mono<PageSupport<T>> getPage(Pageable pageable) {
+        return null;
     }
 }
