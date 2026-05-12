@@ -2,11 +2,13 @@ package com.mitocode.controller;
 
 import com.mitocode.dto.DishDTO;
 import com.mitocode.model.Dish;
+import com.mitocode.pagination.PageSupport;
 import com.mitocode.service.IDishService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.Link;
 import org.springframework.http.MediaType;
@@ -125,6 +127,26 @@ public class DishController {
         // PRACTICA IDEAL
         return service.findById(id)
                 .zipWith(monoLink, EntityModel::of);
+    }
+
+    @GetMapping("/pageable")
+    public Mono<ResponseEntity<PageSupport<DishDTO>>> getPage(
+            @RequestParam(name = "page") int page,
+            @RequestParam(name = "size") int size
+    ){
+        return service.getPage(Dish.class, PageRequest.of(page, size))
+                .map(ps -> new PageSupport<>(
+                        ps.getContent().stream().map(this::convertToDTO).toList(),
+                        ps.getPageNumber(),
+                        ps.getPageSize(),
+                        ps.getTotalElements()
+                ))
+                .map(e -> ResponseEntity
+                        .ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(e)
+                )
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     private DishDTO convertToDTO(Dish dish){

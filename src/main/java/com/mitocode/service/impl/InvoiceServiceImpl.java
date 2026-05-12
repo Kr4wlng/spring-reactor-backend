@@ -37,7 +37,7 @@ public class InvoiceServiceImpl extends CRUDImpl<Invoice, String> implements IIn
     public Mono<byte[]> generateReport(String idInvoice) {
         return invoiceRepo.findById(idInvoice)
                 .flatMap(this::populateClient)
-                .flatMap(this::populateDishes)
+                .flatMap(this::populateItems)
                 .map(this::generatePDF);
     }
 
@@ -49,7 +49,7 @@ public class InvoiceServiceImpl extends CRUDImpl<Invoice, String> implements IIn
                 });
     }
 
-    private Mono<Invoice> populateDishes(Invoice invoice){
+    private Mono<Invoice> populateItems(Invoice invoice){
         List<Mono<InvoiceDetail>> list = invoice.getItems().stream()
                 .map(item ->
                         dishRepo.findById(item.getDish().getId())
@@ -62,7 +62,7 @@ public class InvoiceServiceImpl extends CRUDImpl<Invoice, String> implements IIn
     }
 
     private byte[] generatePDF(Invoice invoice){
-        try(InputStream stream = getClass().getResourceAsStream("/facturas.jrxml")){
+        try(InputStream stream = getClass().getResourceAsStream("/factura.jrxml")){
             Map<String, Object> params = new HashMap<>();
             params.put("txt_client", invoice.getClient().getFirstName() + " " + invoice.getClient().getLastName());
 

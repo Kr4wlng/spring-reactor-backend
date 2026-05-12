@@ -15,7 +15,7 @@ public class PageSupport<T> {
     public static final String FIRST_PAGE_NUM = "0";
     public static final String DEFAULT_PAGE_SIZE = "10";
 
-    private List<T> context;
+    private List<T> content;
     private int pageNumber;
     private int pageSize;
     private long totalElements;

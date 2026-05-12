@@ -2,11 +2,20 @@
 <!-- Created with Jaspersoft Studio version 6.10.0.final using JasperReports Library version 6.10.0-unknown  -->
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="factura" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="b2db3261-2615-40cd-a2ed-b6f1f7eef8ba">
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="One Empty Record"/>
+	<parameter name="txt_client" class="java.lang.String"/>
 	<queryString>
 		<![CDATA[]]>
 	</queryString>
+	<field name="quantity" class="java.lang.Integer"/>
+	<field name="dish" class="com.mitocode.model.Dish"/>
 	<background>
-		<band/>
+		<band height="15">
+			<textField>
+				<reportElement mode="Opaque" x="20" y="0" width="515" height="13" backcolor="#E6E6E6" uuid="e905621b-0fb8-4b3a-9a5a-99e037691e9c"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
+			</textField>
+		</band>
 	</background>
 	<title>
 		<band height="72">
@@ -17,55 +26,68 @@
 					<textElement>
 						<font size="34" isBold="true"/>
 					</textElement>
-					<text><![CDATA[TITLE]]></text>
+					<text><![CDATA[INVOICES]]></text>
 				</staticText>
 				<staticText>
 					<reportElement x="395" y="43" width="180" height="20" forecolor="#FFFFFF" uuid="317fd7fa-cbef-4aa6-8118-ae438522eee4"/>
 					<textElement textAlignment="Right">
 						<font size="14" isBold="false"/>
 					</textElement>
-					<text><![CDATA[Add a description here]]></text>
+					<text><![CDATA[Invoice report]]></text>
 				</staticText>
 			</frame>
 		</band>
 	</title>
 	<pageHeader>
-		<band height="13"/>
+		<band height="44">
+			<textField>
+				<reportElement x="100" y="10" width="100" height="30" uuid="b8c0258b-f0f7-4238-a592-3691a1684295"/>
+				<textFieldExpression><![CDATA[$P{txt_client}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="10" width="100" height="30" uuid="4bf00ca9-99f3-4223-9b49-75580ab258f8"/>
+				<text><![CDATA[Client:]]></text>
+			</staticText>
+		</band>
 	</pageHeader>
 	<columnHeader>
-		<band height="21">
+		<band height="25">
 			<line>
 				<reportElement x="-20" y="20" width="595" height="1" forecolor="#666666" uuid="d33daaeb-8437-4aee-b825-38e1e0f5e267"/>
 			</line>
+			<staticText>
+				<reportElement x="0" y="0" width="100" height="20" uuid="8ad93896-4c3f-4f6d-8925-2d591201b826">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="8169f4a6-65e6-49ce-9057-ea169a0d77a4"/>
+				</reportElement>
+				<text><![CDATA[Quantity]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="110" y="0" width="100" height="20" uuid="05d3530d-ff4d-47dd-b34b-9d3297a9d3b1">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="cd28f649-1977-4da0-8dd1-f5b108f42bd5"/>
+				</reportElement>
+				<text><![CDATA[Dish]]></text>
+			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
-		<band height="20">
-			<line>
-				<reportElement positionType="FixRelativeToBottom" x="0" y="19" width="555" height="1" uuid="509bdefd-54ed-42c4-bff4-e5483b73eb6b"/>
-			</line>
+		<band height="39">
+			<textField>
+				<reportElement x="0" y="-4" width="100" height="30" uuid="ba627da4-84b3-4aec-a2e3-665f17e11440">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="8169f4a6-65e6-49ce-9057-ea169a0d77a4"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{quantity}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="110" y="-4" width="100" height="30" uuid="f48f8e2a-f7ec-4cd6-b22a-79a3ba2d7587">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="cd28f649-1977-4da0-8dd1-f5b108f42bd5"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{dish}.getName()]]></textFieldExpression>
+			</textField>
 		</band>
 	</detail>
 	<columnFooter>
 		<band/>
 	</columnFooter>
-	<pageFooter>
-		<band height="17">
-			<textField>
-				<reportElement mode="Opaque" x="0" y="4" width="515" height="13" backcolor="#E6E6E6" uuid="e905621b-0fb8-4b3a-9a5a-99e037691e9c"/>
-				<textElement textAlignment="Right"/>
-				<textFieldExpression><![CDATA["Page "+$V{PAGE_NUMBER}+" of"]]></textFieldExpression>
-			</textField>
-			<textField evaluationTime="Report">
-				<reportElement mode="Opaque" x="515" y="4" width="40" height="13" backcolor="#E6E6E6" uuid="6e210606-e875-4832-b241-7992813f6071"/>
-				<textFieldExpression><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
-			</textField>
-			<textField pattern="EEEEE dd MMMMM yyyy">
-				<reportElement x="0" y="4" width="100" height="13" uuid="75736bc7-d01a-42a4-8fc5-7e6e11e64859"/>
-				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
-			</textField>
-		</band>
-	</pageFooter>
 	<summary>
 		<band/>
 	</summary>
