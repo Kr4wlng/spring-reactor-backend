@@ -1,18 +1,27 @@
 package com.mitocode.handler;
 
 import com.mitocode.dto.DishDTO;
+import com.mitocode.dto.ValidationDTO;
 import com.mitocode.model.Dish;
 import com.mitocode.service.IDishService;
+import com.mitocode.validator.RequestValidator;
+import jakarta.validation.Validation;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.Errors;
 import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
+import org.springframework.validation.Validator;
+
+import javax.print.attribute.standard.Media;
 
 import static org.springframework.web.reactive.function.BodyInserters.fromValue;
 
@@ -23,6 +32,8 @@ public class DishHandler {
     private final IDishService service;
     @Qualifier("/defaultMapper")
     private final ModelMapper modelMapper;
+    // private final Validator validator;
+    private final RequestValidator requestValidator;
 
     public Mono<ServerResponse> findAll(ServerRequest request){
         return ServerResponse
@@ -47,7 +58,35 @@ public class DishHandler {
     public Mono<ServerResponse> save(ServerRequest request){
         Mono<DishDTO> monoDishDTO = request.bodyToMono(DishDTO.class);
 
+
+
+        /* return monoDishDTO
+                .flatMap(e -> {
+                    Errors errors = new BeanPropertyBindingResult(e, DishDTO.class.getName());
+                    validator.validate(e, errors);
+
+                    if (errors.hasErrors()){
+                        return Flux.fromIterable(errors.getFieldErrors())
+                                .map(error -> new ValidationDTO(error.getField(), error.getDefaultMessage()))
+                                .collectList()
+                                .flatMap(list -> ServerResponse
+                                        .badRequest()
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .body(fromValue(list))
+                                );
+                    } else {
+                        return service.save(this.converToDocument(e))
+                                .map(this::convertToDTO)
+                                .flatMap(dto -> ServerResponse
+                                        .created(URI.create(request.uri().toString().concat("/").concat(e.getId())))
+                                        .contentType(MediaType.APPLICATION_JSON)
+                                        .body(fromValue(dto))
+                                );
+                    }
+                }); */
+
         return monoDishDTO
+                .flatMap(requestValidator::validate)
                 .flatMap(e -> service.save(converToDocument(e)))
                 .map(this::convertToDTO)
                 .flatMap(e -> ServerResponse
