@@ -1,5 +1,6 @@
 package com.mitocode.security;
 
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +34,29 @@ public class JwtUtil {
                 .expiration(new Date(System.currentTimeMillis() + JWT_TOKEN_VALIDITY))
                 .signWith(key)
                 .compact();
+    }
+
+    public Claims getAllClaimsFromToken(String token){
+        SecretKey key = Keys.hmacShaKeyFor(secret.getBytes());
+
+        return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
+    }
+
+    public String getUsernameFromToken(String token){
+        return getAllClaimsFromToken(token).getSubject();
+    }
+
+    public Date getExpirationDateFromToken(String token){
+        return getAllClaimsFromToken(token).getExpiration();
+    }
+
+    public boolean validateToken(String token){
+        return !isTokenExpired(token);
+    }
+
+    private boolean isTokenExpired(String token){
+        final Date expiration = getExpirationDateFromToken(token);
+        return expiration.before(new Date());
     }
 
 }
