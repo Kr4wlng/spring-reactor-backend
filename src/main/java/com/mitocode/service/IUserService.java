@@ -1,6 +1,6 @@
 package com.mitocode.service;
 
-import com.mitocode.security.User;
+import com.mitocode.model.User;
 import reactor.core.publisher.Mono;
 
 public interface IUserService extends ICRUD<User, String> {
