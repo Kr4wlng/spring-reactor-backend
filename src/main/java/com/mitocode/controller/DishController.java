@@ -14,6 +14,7 @@ import org.springframework.hateoas.Link;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
@@ -34,6 +35,8 @@ public class DishController {
     @Qualifier("defaultMapper")
     private final ModelMapper modelMapper;
 
+    @PreAuthorize("@authValidator.hasAccess()")
+    // @PreAuthorize("hasAuthority('ADMIN')")
     @GetMapping
     public Mono<ResponseEntity<Flux<DishDTO>>> findAll(){
         Flux<DishDTO> fx = service.findAll().map(this::convertToDTO);
